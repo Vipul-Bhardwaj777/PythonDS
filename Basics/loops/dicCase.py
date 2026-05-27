@@ -13,6 +13,6 @@ discounts = {
 for user in users:
     disc_percent, flat_disc = discounts.get(user.get('coupon'),(0,0))
 
-    total_discount = user.get('total_bill') * disc_percent + flat_disc
+    total_discount = user.get('total_bill') * disc_percent / 100 + flat_disc
 
     print(f'{user.get('name')} payed {user.get('total_bill')} and got a discount of {total_discount:.2f}')

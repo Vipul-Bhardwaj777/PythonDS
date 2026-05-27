@@ -3,7 +3,7 @@
 def make_chai(*ingredients,**extras):
     print(f'Ingredients: {ingredients}, Extras: {extras}')
 
-# make_chai('ginger','cinnamon','cardamom',milk='full cream')
+make_chai('ginger','cinnamon','cardamom',milk='full cream')
 
 
 def empty_param(array=None):
@@ -11,5 +11,5 @@ def empty_param(array=None):
     array.append('Hii')
     print(f'{array}')
 
-empty_param()
-empty_param()
+# empty_param()
+# empty_param()
