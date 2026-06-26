@@ -7,6 +7,12 @@ load_dotenv()
 
 G_KEY = os.getenv('GEMINI_API_KEY')
 
+# ChatMl prompting style
+# {
+#         'role': "user" | 'system' | 'assistant',
+#         'content': ''
+# }
+
 # Chain of thaught prompting 
 
 SYSTEM_PROMPT = """You are a helpful AI assistant named Brody.
