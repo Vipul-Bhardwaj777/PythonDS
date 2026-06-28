@@ -1,17 +1,18 @@
 from multiprocessing import Process
 import time
 
+
 def crunching():
-    print('Started crunching...')
+    print("Started crunching...")
 
     total = 0
     for _ in range(10**8):
         total += 1
 
-    print('Crunching done.')
+    print("Crunching done.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     start_time = time.time()
 
@@ -25,6 +26,4 @@ if __name__ == '__main__':
 
     end_time = time.time()
 
-    print(f'Processing finished in {end_time - start_time:.2f} seconds')
-
-
+    print(f"Processing finished in {end_time - start_time:.2f} seconds")

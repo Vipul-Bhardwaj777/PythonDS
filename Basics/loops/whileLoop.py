@@ -8,13 +8,13 @@
 
 # print('Tea is boiling')
 
-flavours = ['ginger','out of stock','discontinued', 'tulsi']
+flavours = ["ginger", "out of stock", "discontinued", "tulsi"]
 
 for flavour in flavours:
-    if flavour == 'out of stock':
+    if flavour == "out of stock":
         continue
-    if flavour == 'discontinued':
-        print(f'{flavour} flavour found')
+    if flavour == "discontinued":
+        print(f"{flavour} flavour found")
         break
 
-    print(f'{flavour} found')
+    print(f"{flavour} found")

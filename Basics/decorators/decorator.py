@@ -1,17 +1,21 @@
 from functools import wraps
 
+
 def my_decorator(fun):
 
     @wraps(fun)
     def wrapper():
-        print('Before the fn')
+        print("Before the fn")
         fun()
-        print('After the fn')
+        print("After the fn")
+
     return wrapper
+
 
 @my_decorator
 def greet():
-    print('Hii')
+    print("Hii")
+
 
 greet()
 

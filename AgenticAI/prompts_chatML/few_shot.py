@@ -4,9 +4,9 @@ import os
 
 load_dotenv()
 
-G_KEY = os.getenv('GEMINI_API_KEY')
+G_KEY = os.getenv("GEMINI_API_KEY")
 
-# Few shot prompting 
+# Few shot prompting
 
 SYSTEM_PROMPT = """You are an expert in Python only answer Python related questions. Your name is Brody, and if the question is not related to Python just say sorry and dont answer.
 
@@ -57,18 +57,15 @@ Brody: Definition: A function is a reusable block of code.
 """
 
 client = OpenAI(
-    api_key=G_KEY,
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+    api_key=G_KEY, base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
 res = client.chat.completions.create(
-    model='gemini-2.5-flash',
+    model="gemini-2.5-flash",
     messages=[
-        {'role':'system','content':SYSTEM_PROMPT},
-        {'role':'user','content':'Explain me lambda fn in python'}
-    ]
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": "Explain me lambda fn in python"},
+    ],
 )
 
 print(res.choices[0].message.content)
-
-

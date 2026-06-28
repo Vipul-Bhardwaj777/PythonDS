@@ -5,7 +5,7 @@ import json
 
 load_dotenv()
 
-G_KEY = os.getenv('GEMINI_API_KEY')
+G_KEY = os.getenv("GEMINI_API_KEY")
 
 # ChatMl prompting style
 # {
@@ -13,7 +13,7 @@ G_KEY = os.getenv('GEMINI_API_KEY')
 #         'content': ''
 # }
 
-# Chain of thaught prompting 
+# Chain of thaught prompting
 
 SYSTEM_PROMPT = """You are a helpful AI assistant named Brody.
 
@@ -41,56 +41,51 @@ Rules:
 """
 
 client = OpenAI(
-    api_key=G_KEY,
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+    api_key=G_KEY, base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
-
 
 
 def run_agent(user_input):
 
     message_history = [
-        {'role':'system','content':SYSTEM_PROMPT},
-        {'role':'user','content':user_input}]
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": user_input},
+    ]
 
     while True:
         res = client.chat.completions.create(
-            model='gemini-2.5-flash-lite',
-            response_format={'type':'json_object'},
-            messages=message_history
+            model="gemini-2.5-flash-lite",
+            response_format={"type": "json_object"},
+            messages=message_history,
         )
 
         raw_res = res.choices[0].message.content
-        message_history.append({"role":'assistant','content':raw_res})
+        message_history.append({"role": "assistant", "content": raw_res})
         parsed_res = json.loads(raw_res)
 
-        if(parsed_res.get('step') == 'think'):
-            print('🔥 ', parsed_res.get('content') )
+        if parsed_res.get("step") == "think":
+            print("🔥 ", parsed_res.get("content"))
             continue
 
-        if(parsed_res.get('step') == 'plan'):
-            print('🧠', parsed_res.get('content'))
+        if parsed_res.get("step") == "plan":
+            print("🧠", parsed_res.get("content"))
             continue
 
-        if(parsed_res.get('step') == 'output'):
-            print('😁', parsed_res.get('content'))
+        if parsed_res.get("step") == "output":
+            print("😁", parsed_res.get("content"))
             break
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     while True:
-        print('\n')
+        print("\n")
 
-        user_query = input('👉 ')
+        user_query = input("👉 ")
 
-        if user_query.strip().lower() == 'q' or user_query.strip() == '':
+        if user_query.strip().lower() == "q" or user_query.strip() == "":
             break
 
         run_agent(user_query)
-    
-        print('\n')
 
-
-
-
+        print("\n")

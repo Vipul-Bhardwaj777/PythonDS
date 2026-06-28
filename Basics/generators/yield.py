@@ -1,8 +1,8 @@
-
 def generator():
-    yield 'cup 1'
-    yield 'cup 2'
-    yield 'cup 3'
+    yield "cup 1"
+    yield "cup 2"
+    yield "cup 3"
+
 
 cups = generator()
 
@@ -14,23 +14,25 @@ def infinite_chai():
     count = 1
 
     while True:
-        yield f'Refill chai {count}'
+        yield f"Refill chai {count}"
         count += 1
+
 
 refill = infinite_chai()
 
 # for _, indx in enumerate(range(6)):
-#     print(next(refill)) 
+#     print(next(refill))
 
 
 def chai_customer():
-    print('Hii! what chai would you take')
+    print("Hii! what chai would you take")
 
     order = yield
 
     while True:
-        print(f'Preparign: {order}')
+        print(f"Preparign: {order}")
         order = yield
+
 
 stall = chai_customer()
 
@@ -40,26 +42,31 @@ stall = chai_customer()
 
 
 def local_chai():
-    yield 'masala chai'
-    yield 'ginger chai'
+    yield "masala chai"
+    yield "ginger chai"
+
 
 def imported_chai():
-    yield 'macha'
-    yield 'oolong'
+    yield "macha"
+    yield "oolong"
+
 
 def full_menu():
     yield from local_chai()
     yield from imported_chai()
 
+
 # for chai in full_menu():
 #     print(chai)
+
 
 def tea_stall():
     try:
         while True:
-         order = yield 'Waiting for order'
+            order = yield "Waiting for order"
     except:
-        print('Stall closed')
+        print("Stall closed")
+
 
 stall = tea_stall()
 

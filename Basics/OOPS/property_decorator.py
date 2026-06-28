@@ -6,14 +6,13 @@ class TeaLeaf:
     @property
     def age(self):
         return self._age + 2
-    
+
     @age.setter
     def age(self, age):
         if 1 <= age <= 5:
             self._age = age
         else:
-            raise ValueError('Leaf age should be between 1 to 5 years!')
-    
+            raise ValueError("Leaf age should be between 1 to 5 years!")
 
 
 leaf = TeaLeaf(2)
@@ -21,4 +20,3 @@ leaf = TeaLeaf(2)
 leaf.age = 6
 
 print(leaf.age)
-              

@@ -2,7 +2,8 @@ class Chai:
     is_hot = True
 
     def describe(self):
-        return f'This cup is hot ? : {'Yes' if self.is_hot else 'NO'}'
+        return f"This cup is hot ? : {'Yes' if self.is_hot else 'NO'}"
+
 
 masala_chai = Chai()
 

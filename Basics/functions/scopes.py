@@ -1,17 +1,20 @@
-#Scopes
+# Scopes
 
-txt = 'Whiskey'
+txt = "Whiskey"
+
 
 def outer_fn():
-    txt = 'Chai'
+    txt = "Chai"
+
     def inner_fn():
         global txt
-        txt = 'Holy cow!!'
-        print(f'inner text {txt}')
-    
+        txt = "Holy cow!!"
+        print(f"inner text {txt}")
+
     inner_fn()
-    print(f'Outer text {txt} ')
+    print(f"Outer text {txt} ")
+
 
 outer_fn()
 
-print(f'Global text {txt}')
+print(f"Global text {txt}")

@@ -1,14 +1,16 @@
 import threading
 import time
 
+
 def crunching():
-    print('Started Crunching the number...')
+    print("Started Crunching the number...")
 
     total = 0
     for _ in range(10**8):
         total += 1
 
-    print('Crunching done.')
+    print("Crunching done.")
+
 
 start_time = time.time()
 
@@ -22,5 +24,4 @@ for t in threads:
 
 end_time = time.time()
 
-print(f'Processing finished after {end_time - start_time:.2f} seconds')
-
+print(f"Processing finished after {end_time - start_time:.2f} seconds")

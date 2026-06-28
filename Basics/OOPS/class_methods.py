@@ -7,13 +7,14 @@ class ChaiOrder:
 
     @classmethod
     def from_dic(cls, dictionary):
-        return cls(dictionary['tea_type'],dictionary['sweetness'],dictionary['size'])
-    
+        return cls(dictionary["tea_type"], dictionary["sweetness"], dictionary["size"])
+
     @classmethod
     def from_string(cls, str):
-        tea_type, sweetness, size = str.split('-')
-        
+        tea_type, sweetness, size = str.split("-")
+
         return cls(tea_type, sweetness, size)
-    
+
+
 order1 = ChaiOrder.from_dic({})
-order2 = ChaiOrder.from_string('')
+order2 = ChaiOrder.from_string("")

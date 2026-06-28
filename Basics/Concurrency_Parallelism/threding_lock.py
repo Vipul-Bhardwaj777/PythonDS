@@ -12,6 +12,7 @@ def increment():
         with lock:
             count += 1
 
+
 threads = [threading.Thread(target=increment) for _ in range(10)]
 
 for t in threads:
@@ -20,4 +21,4 @@ for t in threads:
 for t in threads:
     t.join()
 
-print(f'{count}')
+print(f"{count}")

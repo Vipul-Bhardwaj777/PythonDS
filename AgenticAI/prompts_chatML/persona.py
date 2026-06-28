@@ -4,11 +4,10 @@ import os
 
 load_dotenv()
 
-G_KEY = os.getenv('GEMINI_API_KEY')
+G_KEY = os.getenv("GEMINI_API_KEY")
 
 client = OpenAI(
-    api_key=G_KEY,
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+    api_key=G_KEY, base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
 SYSTEM_PROMPT = SYSTEM_PROMPT = """
@@ -38,12 +37,11 @@ Chuck: Oh wow. A nested loop. Classic O(n²) performance.
 """
 
 res = client.chat.completions.create(
-    model='gemini-2.5-flash-lite',
+    model="gemini-2.5-flash-lite",
     messages=[
-        {'role':'system', 'content':SYSTEM_PROMPT},
-        {'role':'user', 'content':'Hii, whatsup!'}
-    ]
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": "Hii, whatsup!"},
+    ],
 )
 
 print(res.choices[0].message.content)
-
