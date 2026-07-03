@@ -3,42 +3,23 @@ from dotenv import load_dotenv
 import os
 import json
 import requests
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, ValidationError, model_validator
 from typing import Optional, Literal
 
 load_dotenv()
 
-G_KEY = os.getenv("GEMINI_API_KEY")
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma2:2b")
 
 client = OpenAI(
-    # api_key=G_KEY, base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+    api_key="ollama",
+    base_url=OLLAMA_BASE_URL,
 )
 
 
 def run_commnd(cmd: str):
     result = os.system(cmd)
     return result
-
-
-def write_file(tool_input: str):
-    try:
-        data = json.loads(tool_input)
-        path = data["path"]
-        content = data["content"]
-    except (json.JSONDecodeError, KeyError, TypeError) as e:
-        return (
-            'Invalid input. Use JSON: {"path": "todo_app/index.html", "content": "file contents"}'
-            f". Error: {e}"
-        )
-
-    parent = os.path.dirname(path)
-    if parent:
-        os.makedirs(parent, exist_ok=True)
-
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(content)
-
-    return f"Wrote {len(content)} bytes to {path}"
 
 
 def get_weather(city: str):
@@ -50,42 +31,30 @@ def get_weather(city: str):
         return f"Weather service unavailable: {e}"
     print(city, res.status_code, "res get_weather")
     if res.status_code == 200:
-        # current_weather = res.json()["current_condition"][0]
-        # desc = current_weather["weatherDesc"][0]["value"].strip()
-        # tempC = current_weather["temp_C"]
         return f"The weather in {city} is {res.text}"
 
     else:
         return f"Could not find weather for {city}"
 
 
-available_tools = {
-    "get_weather": get_weather,
-    "run_commnd": run_commnd,
-    "write_file": write_file,
-}
-
-MAX_TOOL_ROUNDS = 20
+available_tools = {"get_weather": get_weather, "run_commnd": run_commnd}
 
 SYSTEM_PROMPT = """
 You are a helpful AI assistant named Brody. You can answer general questions and use tools when needed.
 Pick the right tool for each task.
 
+You MUST respond with a single valid JSON object only. No markdown, no code fences, no extra text.
+Required keys: "step", "content". For tool steps also include "available_tool" and "tool_input".
+
 Return only the NEXT step. Never return multiple steps in one message.
+Never repeat the same step twice. After think, the next response MUST be plan. After plan, MUST be tool.
 
-Step flow:
-- Start: think → plan → tool
-- After observe: if more tools are needed → plan → tool again (repeat as needed)
-- After observe: only when ALL required work is done → output
+Follow steps in order across multiple turns:
 
-After think, the next response MUST be plan. After plan, MUST be tool.
-Do NOT return output until every required tool call has finished and you have seen observe for each one.
-
-Steps:
-- think: Understand the request and list all files or actions needed (use once at the start).
-- plan: Pick the next single tool call (or say all work is done before output).
-- tool: Call one tool. Set available_tool and tool_input. Leave content empty or brief.
-- output: Final user-facing answer after all tools are done.
+STEP 1 - think: Understand what the user is asking and break it down.
+STEP 2 - plan: Decide the best approach and which tool to use (get_weather or run_commnd).
+STEP 3 - tool: Call the tool. Set available_tool and tool_input. Leave content empty or brief.
+STEP 4 - output: Give the final answer using the observe result from conversation history.
 
 After you send a tool step, STOP and wait. The system runs the tool and injects an observe message with real output.
 Do NOT generate observe yourself. Never invent tool output or fake command results.
@@ -94,45 +63,45 @@ Available tools:
 - get_weather(city: str): Use ONLY for weather questions. tool_input is the city name.
 - run_commnd(cmd: str): Use for shell tasks (mkdir, ls, pwd, etc.). tool_input is the full Linux command.
   The user runs WSL/Linux — use Linux syntax (mkdir -p, ls, not PowerShell commands).
-- write_file: Write or overwrite a file. tool_input is JSON: {"path": "relative/path", "content": "file contents"}.
-  Use for creating or editing code files (HTML, CSS, JS, Python, etc.). One file per tool call.
+
 
 Tool selection:
 - Weather question → get_weather
 - Create folder, list files, run shell command → run_commnd
-- Write or edit file contents → write_file (never paste code only in output)
-- General knowledge with no tool needed → still follow think/plan; use tools only when required
+- General knowledge with no tool needed → still follow think/plan; use run_commnd only if a command is required
 
-Example 1 — weather (single tool):
+Example 1 — weather:
 
 USER: What is the weather in Palampur?
 
 ASSISTANT: {"step": "think", "content": "The user wants current weather for Palampur."}
+
 ASSISTANT: {"step": "plan", "content": "I will use get_weather with Palampur as the city."}
+
 ASSISTANT: {"step": "tool", "available_tool": "get_weather", "tool_input": "Palampur", "content": ""}
-(System injects observe — you do not write this step.)
+
+(System injects observe with real tool output — you do not write this step.)
+
 ASSISTANT: {"step": "output", "content": "Based on the tool result, here is the current weather in Palampur: ..."}
 
-Example 2 — multi-file todo app (multiple tools before output):
+Example 2 — create folder:
 
-USER: Create a todo app with HTML, CSS, and JS in todo_app/.
+USER: Create a folder named todo_app in the AgenticAI directory.
 
-ASSISTANT: {"step": "think", "content": "Need write_file for index.html, styles.css, and script.js."}
-ASSISTANT: {"step": "plan", "content": "First I will write todo_app/index.html."}
-ASSISTANT: {"step": "tool", "available_tool": "write_file", "tool_input": "{\\"path\\": \\"todo_app/index.html\\", \\"content\\": \\"...\\"}", "content": ""}
-(System injects observe.)
-ASSISTANT: {"step": "plan", "content": "index.html done. Next I will write todo_app/styles.css."}
-ASSISTANT: {"step": "tool", "available_tool": "write_file", "tool_input": "{\\"path\\": \\"todo_app/styles.css\\", \\"content\\": \\"...\\"}", "content": ""}
-(System injects observe.)
-ASSISTANT: {"step": "plan", "content": "styles.css done. Next I will write todo_app/script.js."}
-ASSISTANT: {"step": "tool", "available_tool": "write_file", "tool_input": "{\\"path\\": \\"todo_app/script.js\\", \\"content\\": \\"...\\"}", "content": ""}
-(System injects observe.)
-ASSISTANT: {"step": "output", "content": "Created index.html, styles.css, and script.js in todo_app/."}
+ASSISTANT: {"step": "think", "content": "The user wants a new folder todo_app in AgenticAI."}
+
+ASSISTANT: {"step": "plan", "content": "I will use run_commnd with mkdir from the parent directory."}
+
+ASSISTANT: {"step": "tool", "available_tool": "run_commnd", "tool_input": "mkdir -p ../todo_app", "content": ""}
+
+(System injects observe — you do not write this step.)
+
+ASSISTANT: {"step": "output", "content": "The folder todo_app was created in the AgenticAI directory."}
 
 Rules:
 - The "content" field must ALWAYS be a plain string. Never return nested JSON inside content.
 - For tool steps, available_tool and tool_input are required.
-- Multi-file or multi-step tasks: run plan → tool → observe repeatedly until every file/action is done, then output.
+- Complete think, plan, tool, then output across separate responses.
 - Keep think and plan concise. Put the user-facing answer in output.
 - Use only real results from observe in output. Never make up data or command output.
 """
@@ -168,21 +137,20 @@ def main(user_input):
         {"role": "user", "content": user_input},
     ]
 
-    tool_rounds = 0
-
     while True:
-        res = client.chat.completions.parse(
-            model="gpt-4o",
+        res = client.chat.completions.create(
+            model=OLLAMA_MODEL,
             messages=message_history,
-            response_format=OutputFormat,
+            response_format={"type": "json_object"},
         )
 
         raw_res = res.choices[0].message.content
         message_history.append({"role": "assistant", "content": raw_res})
 
-        parsed_res = res.choices[0].message.parsed
-        if parsed_res is None:
-            print(f"⚠️ Could not parse response: {raw_res}")
+        try:
+            parsed_res = OutputFormat.model_validate(json.loads(raw_res))
+        except (json.JSONDecodeError, ValidationError) as e:
+            print(f"⚠️ Could not parse response: {raw_res}\n{e}")
             break
 
         if parsed_res.step == "think":
@@ -194,11 +162,6 @@ def main(user_input):
             continue
 
         if parsed_res.step == "tool":
-            tool_rounds += 1
-            if tool_rounds > MAX_TOOL_ROUNDS:
-                print(f"⚠️ Stopped after {MAX_TOOL_ROUNDS} tool calls.")
-                break
-
             tool_parsed = parsed_res.available_tool
             input_parsed = parsed_res.tool_input
 
@@ -230,6 +193,7 @@ def main(user_input):
 
 
 if __name__ == "__main__":
+    print(f"Using Ollama model: {OLLAMA_MODEL} at {OLLAMA_BASE_URL}\n")
 
     while True:
         print("\n")
