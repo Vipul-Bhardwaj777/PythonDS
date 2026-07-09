@@ -1,22 +1,42 @@
-from transformers import pipeline
-import torch
+from openai import OpenAI
+from dotenv import load_dotenv
 
-pipe = pipeline(
-    "image-text-to-text",
-    model="google/gemma-3-4b-it",
-)
+load_dotenv()
 
-messages = [
-    {
-        "role": "user",
-        "content": [
-            {
-                "type": "image",
-                "url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/p-blog/candy.JPG",
-            },
-            {"type": "text", "text": "What animal is on the candy?"},
-        ],
-    }
-]
+client = OpenAI()
 
-pipe(text=messages)
+
+def main(image_url: str):
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "Describe the elements of this image?"},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": image_url},
+                },
+            ],
+        }
+    ]
+
+    res = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+    )
+
+    print(res.choices[0].message.content)
+
+
+if __name__ == "__main__":
+    while True:
+        print("\n")
+
+        user_input = input("👉 ")
+
+        if user_input.strip().lower() == "q" or user_input.strip() == "":
+            break
+
+        main(user_input)
+
+        print("\n")
