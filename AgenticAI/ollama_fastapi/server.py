@@ -1,3 +1,10 @@
+"""
+Prereq: Ollama at http://localhost:11434
+From AgenticAI:
+  uvicorn ollama_fastapi.server:app --reload --port 8000
+Docs: http://localhost:8000/docs
+"""
+
 from fastapi import FastAPI, Body
 from ollama import Client
 

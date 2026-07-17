@@ -74,8 +74,8 @@ graph_builder = StateGraph(State)
 
 graph_builder.add_node("chat_bot", chat_bot)
 graph_builder.add_node("chat_bot_large", chat_bot_large)
-graph_builder.add_node("end_node", end_node)
 graph_builder.add_node("evalutate", evalutate)
+graph_builder.add_node("end_node", end_node)
 
 graph_builder.add_edge(START, "chat_bot")
 graph_builder.add_edge("chat_bot", "evalutate")

@@ -1,3 +1,17 @@
+r"""
+RQ job: RAG retrieval + OpenAI answer.
+
+Prereqs: Qdrant :6333, Valkey :6379, indexed collection learning_rag, OPENAI_API_KEY.
+
+Run worker (Windows — use SimpleWorker; default RQ uses os.fork and crashes):
+  cd AgenticAI
+  .\.venv\Scripts\Activate.ps1
+  rq worker --worker-class rq.worker.SimpleWorker --url redis://localhost:6379
+
+Then start API: python -m rag_queue.main
+Use /docs: POST /chat -> GET /job-status with the new job_id.
+"""
+
 from openai import OpenAI
 from dotenv import load_dotenv
 from langchain_qdrant import QdrantVectorStore

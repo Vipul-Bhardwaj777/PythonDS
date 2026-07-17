@@ -1,3 +1,9 @@
+# Qdrant vector DB on port 6333.
+# From AgenticAI/rag:
+#   docker compose up -d
+# Dashboard: http://localhost:6333/dashboard
+# Stop: docker compose down
+
 services:
   vector-db:
     image: qdrant/qdrant

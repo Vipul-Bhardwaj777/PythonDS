@@ -1,3 +1,9 @@
+# Valkey (Redis-compatible) job queue on port 6379.
+# From AgenticAI/rag_queue:
+#   docker compose up -d
+# No browser UI — use Redis/Valkey CLI if needed.
+# Stop: docker compose down
+
 services:
   valkey:
     image: valkey/valkey

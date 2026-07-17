@@ -1,3 +1,19 @@
+"""
+FastAPI app: enqueue RAG jobs and poll results.
+
+Do not run this file directly. Start via:
+  python -m rag_queue.main
+
+Or: uvicorn rag_queue.server:app --host 0.0.0.0 --port 8000
+
+Endpoints:
+  GET  /              health
+  POST /chat?query=   enqueue job -> {job_id}
+  GET  /job-status?job_id=  fetch result
+
+Requires Valkey + RQ worker running (see queue/worker.py header).
+"""
+
 from fastapi import FastAPI, Query
 from .queue.worker import process_query
 from .client.rq_client import r_queue

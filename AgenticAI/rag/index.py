@@ -1,3 +1,17 @@
+"""
+Indexing: load nodejs.pdf -> chunks -> embeddings -> Qdrant collection learning_rag.
+
+Prereqs: Qdrant running (see rag/docker-compose.yml), OPENAI_API_KEY in AgenticAI/.env.
+
+From AgenticAI:
+  cd rag
+  docker compose up -d
+  cd ..
+  python rag/index.py
+
+Run once, or again after changing the PDF / wiping Qdrant.
+"""
+
 from pathlib import Path
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
