@@ -4,10 +4,15 @@ from typing import Annotated
 from langgraph.graph.message import add_messages
 from langgraph.graph import StateGraph, START, END
 from langchain.chat_models import init_chat_model
+from langgraph.checkpoint.mongodb import MongoDBSaver
+from pprint import pprint
+
 
 load_dotenv()
 
 llm = init_chat_model(model="gpt-4.1-mini", model_provider="openai")
+
+config = {"configurable": {"thread_id": "vipul-thread-1"}}
 
 
 # Graph state
@@ -23,21 +28,24 @@ def chat_bot(state: State):
     return {"messages": res}
 
 
-def sample_node(state: State):
-    return {"messages": ["Hii from the sample_node"]}
-
-
 graph_builder = StateGraph(State)
 
 graph_builder.add_node("chat_bot", chat_bot)
-graph_builder.add_node("sample_node", sample_node)
 
 graph_builder.add_edge(START, "chat_bot")
-graph_builder.add_edge("chat_bot", "sample_node")
-graph_builder.add_edge("sample_node", END)
+graph_builder.add_edge("chat_bot", END)
 
-graph = graph_builder.compile()
 
-graph_result = graph.invoke({"messages": ["Hii, my name is Vipul"]})
+with MongoDBSaver.from_conn_string(
+    "mongodb://admin:admin@localhost:27017/?authSource=admin",
+    db_name="langgraph_checkpoints",
+) as checkpointer:
 
-print(graph_result)
+    graph = graph_builder.compile(checkpointer=checkpointer)
+
+    graph_result = graph.invoke(
+        {"messages": ["Hii, who am i?"]},
+        config=config,
+    )
+
+    pprint(graph_result)
