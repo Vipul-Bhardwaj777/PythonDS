@@ -87,8 +87,6 @@ def main(user_input: str) -> None:
         {"messages": [{"role": "user", "content": user_input}]},
     )
 
-    # Print the full trajectory so you can see reason → tool → observe → answer
-    print("\n--- agent trajectory ---")
     for msg in result["messages"]:
         role = getattr(msg, "type", msg.__class__.__name__)
         content = getattr(msg, "content", "")
@@ -98,11 +96,14 @@ def main(user_input: str) -> None:
             print(f"🤖 [{role}] tool_calls:")
             print(json.dumps(tool_calls, indent=2, default=str))
         else:
-            preview = content if isinstance(content, str) else json.dumps(content, default=str)
+            preview = (
+                content
+                if isinstance(content, str)
+                else json.dumps(content, default=str)
+            )
             print(f"📨 [{role}] {preview}")
 
     final = result["messages"][-1]
-    print("\n--- final answer ---")
     print(getattr(final, "content", final))
 
 

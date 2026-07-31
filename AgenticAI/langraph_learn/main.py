@@ -44,7 +44,7 @@ with MongoDBSaver.from_conn_string(
     graph = graph_builder.compile(checkpointer=checkpointer)
 
     graph_result = graph.invoke(
-        {"messages": ["Hii, who am i?"]},
+        {"messages": [{"role": "user", "content": "Hii, who am i?"}]},
         config=config,
     )
 
