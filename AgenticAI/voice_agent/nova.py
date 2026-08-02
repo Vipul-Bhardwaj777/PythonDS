@@ -64,7 +64,8 @@ def write_file(path: str, content: str) -> str:
 
 
 SYSTEM_PROMPT = """
-You are Brody, a helpful voice coding assistant.
+You are Nova, a helpful voice coding assistant.
+Your name is Nova — when the user greets you (hi Nova, hey Nova, etc.), greet them back warmly by name if you know it, or simply as Nova.
 User input comes from speech-to-text (may have typos or misheard words).
 Use tools when needed. Prefer tools over guessing for files and shell tasks.
 You are on Windows: for new folders prefer write_file (it creates parent dirs), or mkdir without -p.
@@ -75,7 +76,7 @@ Keep final answers to 1-3 sentences when speaking a summary after tools run.
 tools = [run_command, write_file]
 
 llm = init_chat_model(model="gpt-4.1", model_provider="openai")
-config = {"configurable": {"thread_id": "brody"}}
+config = {"configurable": {"thread_id": "nova"}}
 
 # This IS the ReAct loop — no while True / observe plumbing from you
 agent = create_agent(
