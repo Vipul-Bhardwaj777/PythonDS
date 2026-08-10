@@ -1,10 +1,9 @@
-# Valkey (Redis-compatible) job queue on port 6379.
-# From AgenticAI/rag_queue:
-#   docker compose up -d
-# No browser UI — use Redis/Valkey CLI if needed.
-# Stop: docker compose down
-
 services:
+  vector-db:
+    image: qdrant/qdrant
+    ports:
+      - 6333:6333
+
   valkey:
     image: valkey/valkey
     ports:

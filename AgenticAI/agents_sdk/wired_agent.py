@@ -136,7 +136,7 @@ def run_agent_job(user_query: str, session_id: str = "wired_chat") -> str:
     """Sync wrapper so RQ can enqueue the same logic.
 
     Example (when Valkey/Redis + worker are up):
-      from rag_queue.client.rq_client import r_queue
+      from rag_queue.queue.connection import r_queue
       job = r_queue.enqueue(run_agent_job, "What is on page 3?", "user_123")
     """
     session = SQLiteSession(session_id)
@@ -146,7 +146,7 @@ def run_agent_job(user_query: str, session_id: str = "wired_chat") -> str:
 def enqueue_example(query: str) -> str | None:
     """Optional: try enqueue; returns job id or None if Redis isn't running."""
     try:
-        from rag_queue.client.rq_client import r_queue
+        from rag_queue.queue.connection import r_queue
 
         job = r_queue.enqueue(run_agent_job, query, "wired_rq_chat")
         return job.id
