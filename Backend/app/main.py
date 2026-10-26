@@ -1,37 +1,29 @@
-from fastapi import FastAPI, Header
-from typing import Optional
+from fastapi import APIRouter, FastAPI
+from app.features.books_crud.DB.main import init_db
 from app.features.books_crud.routes import router as books_router
-from app.schema import TodoReq, TodoRes
+from app.features.first_rest.routes import router as rest_router
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="FastAPI Backend", version="0.1.0")
-app.include_router(books_router)
+
+@asynccontextmanager
+async def life_span(app: FastAPI):
+    print("Server is starting...")
+    await init_db()
+    yield
+    print("Server stopped")
+
+
+version = "v1"
+
+app = FastAPI(title="FastAPI Backend", version=version, lifespan=life_span)
+api = APIRouter(prefix=f"/api/{version}")
+
+api.include_router(books_router, prefix=f"/books", tags=["Books Crud"])
+api.include_router(rest_router, prefix=f"/rest", tags=["Rest"])
+
+app.include_router(api)
 
 
 @app.get("/")
 async def root_read():
     return {"server": "ok"}
-
-
-@app.get("/greet/{state}")
-async def greet(city: str, state: str, name: Optional[str] = "User") -> dict:
-    return {"message": f"Hii {name} from {city}, {state}!"}
-
-
-@app.post("/create_todo", response_model=TodoRes)
-async def create_todo(data: TodoReq) -> TodoRes:
-    return {"message": "Todo created!"}
-
-
-@app.get("/get_headers", status_code=201)
-async def get_headers(
-    accept: str = Header(None),
-    content_type: str = Header(None),
-    user_agent: str = Header(None),
-    host: str = Header(None),
-) -> dict:
-    response_headers = {}
-    response_headers["Accept"] = accept
-    response_headers["Content-Type"] = content_type
-    response_headers["User-Agent"] = user_agent
-    response_headers["Host"] = host
-    return response_headers
