@@ -1,7 +1,8 @@
 from fastapi import APIRouter, FastAPI
 from app.features.books_crud.DB.main import init_db
-from app.features.books_crud.routes import router as books_router
-from app.features.first_rest.routes import router as rest_router
+from .features.books_crud.routes import router as books_router
+from .features.first_rest.routes import router as rest_router
+from .features.auth.routes import router as auth_router
 from contextlib import asynccontextmanager
 
 
@@ -20,6 +21,7 @@ api = APIRouter(prefix=f"/api/{version}")
 
 api.include_router(books_router, prefix=f"/books", tags=["Books Crud"])
 api.include_router(rest_router, prefix=f"/rest", tags=["Rest"])
+api.include_router(auth_router, prefix="/auth", tags=["Auth"])
 
 app.include_router(api)
 
