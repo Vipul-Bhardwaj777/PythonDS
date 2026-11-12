@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import select
 from .schemas import UserCreate, UserUpdateResponse
@@ -35,8 +37,9 @@ class AuthService:
         if user is None:
             return None
 
-        for key, val in update_data.model_dump().items():
+        for key, val in update_data.model_dump(exclude_unset=True).items():
             setattr(user, key, val)
+        user.updated_at = datetime.now()
 
         session.add(user)
         await session.commit()

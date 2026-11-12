@@ -1,7 +1,9 @@
+from datetime import datetime
+
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import desc, select
 from .schema import BookCreate, BookUpdate
-from .DB.models import Book
+from .models import Book
 import uuid
 
 
@@ -30,6 +32,7 @@ class BookService:
             return None
         for key, val in update_data.model_dump(exclude_unset=True).items():
             setattr(book, key, val)
+        book.updated_at = datetime.now()
         session.add(book)
         await session.commit()
         await session.refresh(book)

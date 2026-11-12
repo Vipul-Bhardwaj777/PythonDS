@@ -24,6 +24,11 @@ class UserCreateResponse(BaseModel):
 
 
 class UserUpdateResponse(BaseModel):
-    username: str
-    first_name: str
-    last_name: str
+    username: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
